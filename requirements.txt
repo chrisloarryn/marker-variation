@@ -1,0 +1,3 @@
+functions-framework==3.*
+google-cloud-scheduler==2.7.3
+google-auth==2.16.2
