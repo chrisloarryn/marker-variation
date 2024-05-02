@@ -31,7 +31,6 @@ def update_scheduler_job(job_name, project_id, region, schedule_time, delta_rang
     print(f'New time: {new_time}')
 
     # Ajusta las cadenas cron asegurándote de que sean válidas
-    # if job_name == 'daily-task-friday' or job_name == 'daily-task-friday-api':
     if job_name == 'daily-task-friday' or job_name == 'daily-task-friday-api':
         job.schedule = new_time.strftime('%M %H * * 5')
     elif job_name == 'daily-task-afternoon-mon-thu' or job_name == 'daily-task-afternoon-mon-thu-api':
