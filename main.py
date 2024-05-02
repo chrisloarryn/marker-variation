@@ -6,7 +6,13 @@ import random
 import json
 
 def adjust_time(current_time, delta_range, min_time, max_time):
-    delta = random.randint(-delta_range, delta_range)
+    # Genera un delta con distribución normal
+    mean = 0
+    std_dev = delta_range / 2  # La desviación estándar determina el rango
+
+    # Genera un delta aleatorio
+    delta = int(random.gauss(mean, std_dev))
+
     adjusted_time = current_time + timedelta(minutes=delta)
     if adjusted_time < min_time:
         adjusted_time = min_time
@@ -45,21 +51,24 @@ def adjust_scheduler_jobs(request):
         request_json = request.get_json()
         project_id = request_json['project_id']
         region = request_json['region']
-        delta_range = 30  # Rango de 30 minutos para las variaciones
+        delta_range = 15  # Rango de 15 minutos para las variaciones
 
-        min_morning = datetime.strptime("08:30", '%H:%M')
+        min_morning = datetime.strptime("08:45", '%H:%M')
         max_morning = datetime.strptime("09:00", '%H:%M')
 
         min_afternoon_mon_thu = datetime.strptime("19:00", '%H:%M')
-        max_afternoon_mon_thu = datetime.strptime("19:30", '%H:%M')
+        max_afternoon_mon_thu = datetime.strptime("19:15", '%H:%M')
 
         min_afternoon_fri = datetime.strptime("16:45", '%H:%M')
-        max_afternoon_fri = datetime.strptime("17:15", '%H:%M')
+        max_afternoon_fri = datetime.strptime("17:00", '%H:%M')
 
         jobs = [
-            ('daily-task-morning', "09:00", min_morning, max_morning),
+            ('daily-task-morning', "09:02", min_morning, max_morning),
             ('daily-task-afternoon-mon-thu', "19:04", min_afternoon_mon_thu, max_afternoon_mon_thu),
-            ('daily-task-friday', "16:47", min_afternoon_fri, max_afternoon_fri)
+            ('daily-task-friday', "16:47", min_afternoon_fri, max_afternoon_fri),
+            ('daily-task-morning-api', "09:02", min_morning, max_morning),
+            ('daily-task-afternoon-mon-thu-api', "19:04", min_afternoon_mon_thu, max_afternoon_mon_thu),
+            ('daily-task-friday-api', "16:47", min_afternoon_fri, max_afternoon_fri),
         ]
 
         for job_name, schedule_time, min_time, max_time in jobs:
