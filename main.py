@@ -23,17 +23,21 @@ def update_scheduler_job(job_name, project_id, region, schedule_time, delta_rang
     print(f'Current time: {current_time}')
     new_time = adjust_time(current_time, delta_range, min_time, max_time)
     print(f'New time: {new_time}')
-    
-    if (job_name == 'daily-task-friday'):
-      job.schedule = new_time.strftime('%H %M * * 5')
-    elif (job_name == 'daily-task-afternoon-mon-thu'):
-      job.schedule = new_time.strftime('%H %M * * 1-4')
+
+    # Ajusta las cadenas cron asegurándote de que sean válidas
+    if job_name == 'daily-task-friday':
+        job.schedule = new_time.strftime('%M %H * * 5')
+    elif job_name == 'daily-task-afternoon-mon-thu':
+        job.schedule = new_time.strftime('%M %H * * 1-4')
     else:
-      job.schedule = new_time.strftime('%H %M * * 1-5')
-    
+        job.schedule = new_time.strftime('%M %H * * 1-5')
+
+    # Asegúrate de que la zona horaria sea válida
+    job.time_zone = 'America/Santiago'  # Ajusta según tu zona horaria
 
     updated_job = client.update_job(job=job)
     print(f'Updated job: {updated_job.name}, Schedule: {job.schedule}')
+
 
 @functions_framework.http
 def adjust_scheduler_jobs(request):
