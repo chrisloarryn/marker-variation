@@ -6,19 +6,21 @@ import random
 import json
 
 def adjust_time(current_time, delta_range, min_time, max_time):
-    # Genera un delta con distribución normal
-    mean = 0
-    std_dev = delta_range / 2  # La desviación estándar determina el rango
+    # Calcula el rango de minutos hasta el máximo y hasta el mínimo
+    max_minutes = int((max_time - current_time).total_seconds() / 60)
+    min_minutes = int((min_time - current_time).total_seconds() / 60)
 
-    # Genera un delta aleatorio
-    delta = int(random.gauss(mean, std_dev))
+    # Genera un delta aleatorio con una distribución sesgada hacia el rango, menos hacia el máximo
+    if random.random() < 0.99:  # 99% de probabilidad de estar en el rango general
+        delta = random.randint(min_minutes, max_minutes - 1)
+    else:  # 1% de probabilidad de tocar exactamente el máximo
+        delta = max_minutes
 
+    # Calcula el tiempo ajustado
     adjusted_time = current_time + timedelta(minutes=delta)
-    if adjusted_time < min_time:
-        adjusted_time = min_time
-    elif adjusted_time > max_time:
-        adjusted_time = max_time
+
     return adjusted_time
+
 
 def update_scheduler_job(job_name, project_id, region, schedule_time, delta_range, min_time, max_time, fixed_time=None):
     client = scheduler_v1.CloudSchedulerClient()
