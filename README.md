@@ -12,5 +12,5 @@ gcloud functions deploy marker-variation \
     --runtime python312 \
     --trigger-http \
     --no-allow-unauthenticated \
-    --update-labels=version=3
+    --update-labels=version=4
 ```

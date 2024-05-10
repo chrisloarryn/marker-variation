@@ -34,9 +34,9 @@ def update_scheduler_job(job_name, project_id, region, schedule_time, delta_rang
         print(f'New time: {new_time}')
 
     # Ajusta las cadenas cron asegurándote de que sean válidas
-    if job_name == 'daily-task-friday':
+    if job_name == 'daily-task-friday' or job_name == 'daily-task-friday-api':
         job.schedule = new_time.strftime('%M %H * * 5')
-    elif job_name == 'daily-task-afternoon-mon-thu':
+    elif job_name == 'daily-task-afternoon-mon-thu' or job_name == 'daily-task-afternoon-mon-thu-api':
         job.schedule = new_time.strftime('%M %H * * 1-4')
     else:
         job.schedule = new_time.strftime('%M %H * * 1-5')
@@ -76,26 +76,37 @@ def adjust_scheduler_jobs(request):
 
         # Ajusta el job de daily-task-13-30
         job_13_30_name = 'daily-task-13-30'
+        job_13_30_name_api = 'daily-task-13-30-api'
+
         schedule_time_13_30 = "13:30"
         job_13_30_new_time = update_scheduler_job(job_13_30_name, project_id, region, schedule_time_13_30, delta_range, min_13_30, max_13_30)
+        job_13_30_new_time_api = update_scheduler_job(job_13_30_name_api, project_id, region, schedule_time_13_30, delta_range, min_13_30, max_13_30)
 
         # Calcula el nuevo tiempo para daily-task-14-15 agregando 45 minutos
         job_14_15_name = 'daily-task-14-15'
+        job_14_15_name_api = 'daily-task-14-15-api'
         job_14_15_new_time = job_13_30_new_time + timedelta(minutes=45)
+        job_14_15_new_time_api = job_13_30_new_time_api + timedelta(minutes=45)
 
         # Asegúrate de que no exceda el rango permitido
-        if job_14_15_new_time < min_14_15:
+        if job_14_15_new_time < min_14_15 or job_14_15_new_time_api < min_14_15:
             job_14_15_new_time = min_14_15
-        elif job_14_15_new_time > max_14_15:
+            job_14_15_new_time_api = min_14_15
+        elif job_14_15_new_time > max_14_15 or job_14_15_new_time_api > max_14_15:
             job_14_15_new_time = max_14_15
+            job_14_15_new_time_api = max_14_15
 
         update_scheduler_job(job_14_15_name, project_id, region, "", 0, min_14_15, max_14_15, fixed_time=job_14_15_new_time)
+        update_scheduler_job(job_14_15_name_api, project_id, region, "", 0, min_14_15, max_14_15, fixed_time=job_14_15_new_time_api)
 
         # Ajusta los otros jobs
         other_jobs = [
             ('daily-task-morning', "09:02", min_morning, max_morning),
             ('daily-task-afternoon-mon-thu', "19:04", min_afternoon_mon_thu, max_afternoon_mon_thu),
             ('daily-task-friday', "16:47", min_afternoon_fri, max_afternoon_fri),
+            ('daily-task-morning-api', "09:02", min_morning, max_morning),
+            ('daily-task-afternoon-mon-thu-api', "19:04", min_afternoon_mon_thu, max_afternoon_mon_thu),
+            ('daily-task-friday-api', "16:47", min_afternoon_fri, max_afternoon_fri)
         ]
 
         for job_name, schedule_time, min_time, max_time in other_jobs:
